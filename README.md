@@ -1,7 +1,8 @@
 # Live Translator — Android 下載站
 
-[Auto-Translater-Frontend-Android](https://github.com/aieverywheresakura/Auto-Translater-Frontend-Android) 編出來的 APK 發給使用者的地方。
-純靜態，沒有建置步驟，部署在 Cloudflare Pages：
+[Auto-Translater-Frontend-Android](https://github.com/aieverywheresakura/Auto-Translater-Frontend-Android)
+（私有倉庫）編出來的 APK 發給使用者的地方。純靜態，沒有建置步驟，部署在
+Cloudflare Pages：
 
 | 網址 | 用途 |
 | --- | --- |
@@ -14,6 +15,10 @@ iOS 版不走這裡，Apple 只允許 App Store：
 
 App 沒有上架 Google Play，所以這一頁就是唯一的官方來源。頁面本身要能回答
 「這個檔案能不能信」，所以校驗值、簽名指紋、系統警告的說明都在上面。
+
+這個倉庫是公開的，而 App 的原始碼倉庫不是。這裡沒有秘密可洩漏：APK、雜湊、
+簽名憑證指紋本來就是要讓每個人都看得到才有意義——校驗值只有一個人知道的話，
+它就不能證明任何事。簽名金鑰不在這裡，在 Android 倉庫的 Actions secrets 裡。
 
 ## 目錄結構
 
@@ -48,7 +53,7 @@ App 沒有上架 Google Play，所以這一頁就是唯一的官方來源。頁�
 
 ## 發一個新版
 
-先從 [GitHub Actions 的 Artifacts](https://github.com/aieverywheresakura/Auto-Translater-Frontend-Android/actions) 下載 `livetranslator-release-apk`，
+先從 Android 倉庫的 [GitHub Actions Artifacts](https://github.com/aieverywheresakura/Auto-Translater-Frontend-Android/actions)（需要該私有倉庫的權限）下載 `livetranslator-release-apk`，
 解開得到 `app-release.apk`（**不是** `app-release-unsigned.apk`，那個裝不了），然後：
 
 ```bash
@@ -109,6 +114,56 @@ APK 不進版控，改用 `wrangler pages deploy` 上傳。
 Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；哪天 APK 逼近
 這條線就得改用外部儲存（R2）而不是繼續塞進 Pages。
 
+## 日常維護
+
+大部分時候要做的事只有一件（發版），其他都是偶爾。按情況對照：
+
+| 情況 | 做什麼 |
+| --- | --- |
+| App 出了新版 | `./tools/release.py <APK> --notes notes.json`，見上一節 |
+| 只改文案、樣式、FAQ | 直接改 `index.html` / `css` / `js`，跑 `./tools/check.py`，push |
+| 加一種語言 | `js/main.js` 的 `I18N` 加一份字典、`LANGS` 加代碼、頁首加一顆按鈕 |
+| 改了版本號或雜湊 | 別手改。真的手改了，`./tools/check.py` 一定要是綠的才能 push |
+| 換簽名金鑰 | 先在頁面上公告舊指紋要換成什麼，再 `--allow-key-change`（見最後一節） |
+| 倉庫太大 | 見〈倉庫大小〉，改用 Direct Upload |
+
+改任何東西之前記得 `git pull`——Cloudflare Pages 不會改倉庫，但你可能在別台機器上改過。
+
+### 文字改在哪裡
+
+一段話只存一份，看語言決定在哪：
+
+- **繁體中文**改 `index.html`。頁面上帶 `data-i18n` 的元素，它的內文就是繁體版本，
+  也是沒有 JS 時顯示的東西；`js/main.js` 開場會把這些字收進字典，所以改 HTML 就夠了。
+- **簡體與英文**改 `js/main.js` 裡 `I18N` 的 `zh-Hans` / `en`，鍵就是 `data-i18n` 的值。
+- 只有 JS 會用到、頁面上沒有的句子（複製成功的提示、非 Android 裝置的提醒），
+  三種語言都寫在 `I18N` 裡，`zh-Hant` 那份只剩這幾句。
+
+新增一個鍵就在 HTML 標 `data-i18n="新的鍵"`，再去 `zh-Hans` 和 `en` 各補一行；
+漏補的話會退回繁體，不會變成空白。
+
+版本、大小、雜湊那幾個欄位不在此列——那些 HTML 與 `version.json` 兩邊都有，
+由 `release.py` 一起改，`check.py` 會盯。
+
+### 每次 push 之後
+
+GitHub Actions 會跑 `tools/check.py`（見 `.github/workflows/check.yml`），
+Cloudflare Pages 會自動部署。兩邊都綠了再去看實際網站：
+
+```bash
+# 線上的版本資訊是不是新的
+curl -s https://download.aieverywhere.top/version.json | python3 -m json.tool
+
+# /latest.apk 有沒有指到新檔案，型別對不對
+curl -sI https://download.aieverywhere.top/latest.apk
+
+# 最實在的一項：真的下載下來算一次，要跟頁面上印的一致
+curl -sL https://download.aieverywhere.top/latest.apk | shasum -a 256
+```
+
+最後那一條算的是**使用者真正拿到的位元組**，中間經過 CDN、快取、重寫規則。
+本機 `check.py` 綠燈只代表倉庫是對的，這一條才代表線上是對的。
+
 ## Cloudflare Pages 設定
 
 專案是純靜態，不需要建置：
@@ -120,6 +175,16 @@ Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；�
 | Build output directory | `/` |
 
 `_headers` 與 `_redirects` 必須在輸出目錄的根，也就是跟 `index.html` 同一層。
+
+### 第一次綁定網域
+
+Pages 專案建好之後預設只有 `<專案名>.pages.dev`。正式網址在專案的
+**Custom domains** 加 `download.aieverywhere.top`，Cloudflare 會自己在
+`aieverywhere.top` 的 DNS 補一筆 CNAME（網域本來就託管在 Cloudflare 的話）。
+憑證幾分鐘內簽好，在那之前開會看到 TLS 錯誤，是正常的。
+
+`pages.dev` 那個網址不要停用——自訂網域的 DNS 或憑證出問題時，它是唯一還能
+發 APK 出去的路，頁面上也印著它當備援。
 
 ### `_headers` 在管什麼
 

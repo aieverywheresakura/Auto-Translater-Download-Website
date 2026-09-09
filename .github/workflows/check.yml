@@ -14,7 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+      # 不裝 Python：runner 本來就有 python3，而 check.py 只用標準函式庫。
       - run: ./tools/check.py
