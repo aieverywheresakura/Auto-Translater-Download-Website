@@ -1,0 +1,42 @@
+{
+  "$comment": "下載頁的唯一事實來源。index.html 的版本、檔案大小、雜湊都由 js/main.js 從這裡讀出來填。發版請用 tools/release.py 產生，不要手改。",
+  "app": "Live Translator",
+  "package": "top.aieverywhere.livetranslator",
+  "platform": "android",
+  "updated": "2026-09-06",
+  "signing": {
+    "subject": "CN=AI Everywhere, O=AI Everywhere, C=CN",
+    "certSha256": "5f115aedaff29add0e2f5d175ee01b9e6699b324d19908178bda72722e078aac",
+    "schemes": ["v2", "v3"]
+  },
+  "latest": {
+    "version": "2.4.0",
+    "versionCode": 20400,
+    "released": "2026-09-06",
+    "file": "download/android/LiveTranslator-2.4.0.apk",
+    "size": 13163783,
+    "sha256": "df31f8b19447c470ae27183922617bfc1225b1285a2368134abc3cdc87bb47c5",
+    "minSdk": 26,
+    "minAndroid": "8.0",
+    "targetSdk": 35,
+    "abis": ["arm64-v8a", "armeabi-v7a", "x86", "x86_64"],
+    "notes": {
+      "zh-Hant": [
+        "與 iOS 版對齊的完整功能：即時語音翻譯、文字翻譯、會話歷史、AI 總結。",
+        "可切換伺服器辨識與裝置端辨識；沒有語音辨識服務的機器會自動停用後者。",
+        "麥克風自動增益，改善安靜環境下整段被判成靜音的問題。"
+      ],
+      "zh-Hans": [
+        "与 iOS 版对齐的完整功能：实时语音翻译、文字翻译、会话历史、AI 总结。",
+        "可切换服务器识别与设备端识别；没有语音识别服务的机器会自动停用后者。",
+        "麦克风自动增益，改善安静环境下整段被判成静音的问题。"
+      ],
+      "en": [
+        "Feature parity with the iOS app: live speech translation, text translation, session history, AI summaries.",
+        "Switchable server-side and on-device recognition; the latter is disabled on devices without a recognition service.",
+        "Microphone auto-gain, so quiet rooms no longer read as pure silence."
+      ]
+    }
+  },
+  "history": []
+}

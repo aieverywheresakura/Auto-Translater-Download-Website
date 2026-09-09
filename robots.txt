@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# 沒必要讓爬蟲反覆抓十幾 MB 的安裝檔。
+Disallow: /download/
+
+Sitemap: https://download.aieverywhere.top/sitemap.xml

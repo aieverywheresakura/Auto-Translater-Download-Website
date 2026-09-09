@@ -1,0 +1,11 @@
+# 對外可以引用的固定網址，不必跟著版本號改。
+/latest.apk                        /download/android/LiveTranslator-2.4.0.apk  302
+/download/android/latest.apk       /download/android/LiveTranslator-2.4.0.apk  302
+/android                           /#download                                  302
+/ios                               /download/ios/                              302
+/appstore                          https://apps.apple.com/us/app/livetranslator/id6757924636  302
+
+# 舊版頁面用過的路徑，留著避免既有連結斷掉。
+/downloads/*                       /download/:splat                            301
+/download/android/app.apk          /download/android/LiveTranslator-2.4.0.apk  301
+/download/android/app-release.apk  /download/android/LiveTranslator-2.4.0.apk  301

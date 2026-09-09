@@ -1,0 +1,20 @@
+# 頁面上寫著的雜湊、版本、檔案大小，必須跟倉庫裡那個 APK 一致。
+# 手改過 index.html 或 version.json 而忘了另一邊，是這個站最容易出、
+# 又最難自己發現的錯——使用者照著頁面校驗失敗時，他無從判斷是我們抄錯
+# 還是檔案被掉包了。所以每次 push 都重算一次。
+name: Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: ./tools/check.py

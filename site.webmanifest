@@ -1,0 +1,13 @@
+{
+  "name": "Live Translator for Android",
+  "short_name": "Live Translator",
+  "description": "Live Translator Android 版官方 APK 下載。",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f6f8f8",
+  "theme_color": "#127a70",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
