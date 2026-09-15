@@ -4,6 +4,7 @@
   "package": "top.aieverywhere.livetranslator",
   "platform": "android",
   "updated": "2026-09-06",
+  "minVersionCode": 0,
   "signing": {
     "subject": "CN=AI Everywhere, O=AI Everywhere, C=CN",
     "certSha256": "5f115aedaff29add0e2f5d175ee01b9e6699b324d19908178bda72722e078aac",

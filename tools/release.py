@@ -104,6 +104,9 @@ def main():
     parser.add_argument("--allow-key-change", action="store_true",
                         help="接受簽名金鑰與線上版本不同（會讓所有使用者無法覆蓋更新）")
     parser.add_argument("--force", action="store_true", help="跳過版本號遞增與覆蓋檢查")
+    parser.add_argument("--min-version-code",
+                        help="低於這個 versionCode 的安裝會被 App 擋在強制更新頁。"
+                             "給 latest 代表就是這一版；不給就沿用 version.json 現有的值")
     args = parser.parse_args()
 
     if not os.path.isfile(args.apk):
@@ -130,6 +133,21 @@ def main():
     if info["versionCode"] <= current["versionCode"] and not args.force:
         fail("versionCode %d 沒有比線上的 %d 大，Android 會把它當成降級而拒絕安裝。"
              % (info["versionCode"], current["versionCode"]))
+
+    # 在複製檔案之前驗，免得驗不過卻已經留下一個 APK。
+    minimum = manifest.get("minVersionCode", 0)
+    if args.min_version_code is not None:
+        if args.min_version_code == "latest":
+            minimum = info["versionCode"]
+        else:
+            try:
+                minimum = int(args.min_version_code)
+            except ValueError:
+                fail("--min-version-code 要是整數或 latest，收到 %r。" % args.min_version_code)
+    if minimum < 0 or minimum > info["versionCode"]:
+        fail("minVersionCode %d 不在 0 到這一版 %d 之間。比最新版還大的話，"
+             "所有人都會卡在強制更新頁，而且沒有任何一版能讓他們通過。"
+             % (minimum, info["versionCode"]))
 
     dest_rel = os.path.join(APK_DIR, NAME_TEMPLATE % info["version"])
     dest_abs = os.path.join(ROOT, dest_rel)
@@ -162,6 +180,7 @@ def main():
 
     manifest["latest"] = release
     manifest["history"] = history
+    manifest["minVersionCode"] = minimum
     manifest["updated"] = released
     manifest["signing"]["certSha256"] = info["certSha256"]
     manifest["signing"]["schemes"] = info["signingSchemes"]
@@ -176,6 +195,8 @@ def main():
     print("已發佈 v%s (%d)" % (release["version"], release["versionCode"]))
     print("  檔案  %s  %.1f MB" % (dest_rel, release["size"] / 1048576.0))
     print("  雜湊  %s" % release["sha256"])
+    if minimum:
+        print("  強制  低於 %d 的安裝會被擋在更新頁" % minimum)
 
     for old in dropped:
         path = os.path.join(ROOT, old["file"])

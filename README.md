@@ -125,6 +125,7 @@ Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；�
 | 加一種語言 | `js/main.js` 的 `I18N` 加一份字典、`LANGS` 加代碼、頁首加一顆按鈕 |
 | 改了版本號或雜湊 | 別手改。真的手改了，`./tools/check.py` 一定要是綠的才能 push |
 | 換簽名金鑰 | 先在頁面上公告舊指紋要換成什麼，再 `--allow-key-change`（見最後一節） |
+| 要所有人都升到這一版 | 發版時加 `--min-version-code latest`（見〈強制更新〉） |
 | 倉庫太大 | 見〈倉庫大小〉，改用 Direct Upload |
 
 改任何東西之前記得 `git pull`——Cloudflare Pages 不會改倉庫，但你可能在別台機器上改過。
@@ -196,6 +197,32 @@ Pages 專案建好之後預設只有 `<專案名>.pages.dev`。正式網址在�
 - `version.json` 開 `Access-Control-Allow-Origin: *`，讓 App 或其他站點也能
   拿它做更新檢查。
 - CSP 只允許同源，頁面本來就沒有任何外部資源。
+
+## 強制更新
+
+App 冷啟動時會讀這裡的 `version.json`（先正式網址，失敗再 `pages.dev`），
+拿自己的 versionCode 去比：
+
+- 低於 `minVersionCode` → 強制更新頁，不能跳過，按鈕打開這個下載頁。
+- 低於 `latest.versionCode` → 跳一個「有新版」的提示，可以按稍後。
+- 其他 → 什麼都不做。
+
+`minVersionCode` 放在最上層而不是 `latest` 裡：`release.py` 每次發版都會整個
+換掉 `latest`，但會原樣保留其他鍵，所以這個值會一直沿用到下次有人改它。
+預設 0，代表不強制。
+
+```bash
+# 這一版修掉了舊版會壞掉的東西，所有人都得升上來
+./tools/release.py app-release.apk --notes notes.json --min-version-code latest
+
+# 或指定一個舊一點的底線
+./tools/release.py app-release.apk --notes notes.json --min-version-code 20400
+```
+
+`release.py` 與 `check.py` 都會拒絕比最新版還大的 `minVersionCode`——那會讓所有人
+卡在更新頁，而且沒有任何一版能讓他們通過。App 端遇到這種值也會當作沒設。
+
+這個門檻只管 Android。iOS 走 App Store，不讀這份檔案，兩個平台可以各自調。
 
 ## 版本資訊格式
 

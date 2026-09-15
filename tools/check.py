@@ -38,6 +38,15 @@ def main():
         manifest = json.load(handle)
     release = manifest["latest"]
 
+    # App 會把低於這個 versionCode 的安裝擋在強制更新頁。比最新版還大的話，
+    # 所有人都被擋住，而且沒有任何一版能讓他們通過。
+    minimum = manifest.get("minVersionCode", 0)
+    if not isinstance(minimum, int) or isinstance(minimum, bool) or minimum < 0:
+        problems.append("minVersionCode 必須是非負整數，現在是 %r" % (minimum,))
+    elif minimum > release["versionCode"]:
+        problems.append("minVersionCode %d 比最新版的 %d 還大，所有人都會卡在強制更新頁"
+                        % (minimum, release["versionCode"]))
+
     if not os.path.isfile(release["file"]):
         print("錯誤：version.json 指向的 %s 不存在。" % release["file"], file=sys.stderr)
         return 1
