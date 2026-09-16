@@ -32,9 +32,10 @@ App 沒有上架 Google Play，所以這一頁就是唯一的官方來源。頁�
 ├── robots.txt            擋爬蟲抓 APK
 ├── sitemap.xml
 ├── site.webmanifest
-├── assets/               圖示
-├── css/style.css
-├── js/main.js            讀 version.json、三語切換、複製雜湊
+├── assets/               圖示、主站 logo
+├── css/style.css         照主站 aieverywhere.top 的外觀，見〈外觀〉
+├── js/theme.js           深淺色的初始判斷，在 <head> 同步載入
+├── js/main.js            讀 version.json、三語切換、深淺色切換、複製雜湊
 ├── download/
 │   ├── android/          APK，檔名帶版本號
 │   └── ios/index.html    路標：跳去 App Store（iOS 不可能有自行發佈的安裝檔）
@@ -122,7 +123,8 @@ Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；�
 | --- | --- |
 | App 出了新版 | `./tools/release.py <APK> --notes notes.json`，見上一節 |
 | 只改文案、樣式、FAQ | 直接改 `index.html` / `css` / `js`，跑 `./tools/check.py`，push |
-| 加一種語言 | `js/main.js` 的 `I18N` 加一份字典、`LANGS` 加代碼、頁首加一顆按鈕 |
+| 加一種語言 | `js/main.js` 的 `I18N` 加一份字典、`LANGS` 與 `LANG_NAMES` 加代碼、`#lang-menu` 加一顆按鈕 |
+| 主站改版了 | 見〈外觀〉 |
 | 改了版本號或雜湊 | 別手改。真的手改了，`./tools/check.py` 一定要是綠的才能 push |
 | 換簽名金鑰 | 先在頁面上公告舊指紋要換成什麼，再 `--allow-key-change`（見最後一節） |
 | 要所有人都升到這一版 | 發版時加 `--min-version-code latest`（見〈強制更新〉） |
@@ -140,11 +142,34 @@ Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；�
 - 只有 JS 會用到、頁面上沒有的句子（複製成功的提示、非 Android 裝置的提醒），
   三種語言都寫在 `I18N` 裡，`zh-Hant` 那份只剩這幾句。
 
+`aria-label` 同理，標 `data-i18n-aria="鍵"`，HTML 裡寫的 `aria-label` 就是繁體版本。
+
 新增一個鍵就在 HTML 標 `data-i18n="新的鍵"`，再去 `zh-Hans` 和 `en` 各補一行；
 漏補的話會退回繁體，不會變成空白。
 
 版本、大小、雜湊那幾個欄位不在此列——那些 HTML 與 `version.json` 兩邊都有，
 由 `release.py` 一起改，`check.py` 會盯。
+
+### 外觀
+
+這一頁是主站 [aieverywhere.top](https://aieverywhere.top/)（倉庫 `aieverywhere-website`）
+的一部分，看起來必須像同一個網站：頁首、頁尾、卡片、按鈕、深淺色都照主站刻，
+頁首頁尾的連結指回主站。主站是 Vue + Tailwind，這裡沒有建置步驟，所以不是共用程式碼，
+而是把主站實際用到的值抄進 `css/style.css` 開頭的變數，並在旁邊註明對應的 Tailwind 色名。
+
+主站改版時要跟著改的地方：
+
+- 配色、卡片底色、陰影：`css/style.css` 的 `:root` 與兩段深色變數（兩段內容必須一致）。
+- 頁首頁尾的連結與文案：`index.html`，簡體與英文在 `js/main.js`。
+  文案盡量沿用主站的翻譯，主站的字串在它建置出來的 `assets/app-*.js` 裡搜得到。
+- Logo：`assets/aieverywhere-logo.svg`，從主站的 `assets/Logo-*.svg` 複製。
+- `404.html` 與 `download/ios/index.html` 用同一套頁首頁尾，沒有語言與深淺色按鈕。
+
+深淺色跟主站同一套規則：`<html>` 上掛 `dark` 或 `light`，localStorage 的 `theme`
+有值就照它，沒有就跟系統。主站在另一個網域，存的值不共用。
+
+顏色一律寫 hex。Tailwind v4 原本給的是 `oklch()`，Android 8 那一代的 WebView 不認，
+而這一頁的訪客正好有不少是舊手機。
 
 ### 每次 push 之後
 
@@ -196,7 +221,8 @@ Pages 專案建好之後預設只有 `<專案名>.pages.dev`。正式網址在�
   發版後要能馬上看到新的。
 - `version.json` 開 `Access-Control-Allow-Origin: *`，讓 App 或其他站點也能
   拿它做更新檢查。
-- CSP 只允許同源，頁面本來就沒有任何外部資源。
+- CSP 只允許同源，頁面本來就沒有任何外部資源——主站的 logo 也是複製一份進來，不是去主站抓。
+  也因為 CSP 不允許 inline script 與 `style` 屬性，深淺色的初始判斷才會獨立成 `js/theme.js`。
 
 ## 強制更新
 

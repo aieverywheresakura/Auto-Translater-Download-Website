@@ -1,8 +1,9 @@
 /*
- * 下載頁的全部行為。三件事：
+ * 下載頁的全部行為（深淺色的初始判斷在 theme.js，得在繪製前跑）。四件事：
  *   1. 從 version.json 把版本／大小／雜湊填進頁面，HTML 裡的值只是沒有 JS 時的後備。
  *   2. 三種語言切換，記在 localStorage。
- *   3. 複製雜湊、提醒非 Android 訪客。
+ *   3. 深淺色切換，跟主站一樣記在 localStorage 的 theme。
+ *   4. 複製雜湊、提醒非 Android 訪客。
  *
  * 沒有建置步驟，所以刻意只用瀏覽器原生 API。
  */
@@ -11,6 +12,7 @@
 
   var LANGS = ['zh-Hant', 'zh-Hans', 'en'];
   var STORAGE_KEY = 'lt-download-lang';
+  var LANG_NAMES = { 'zh-Hant': '繁體中文', 'zh-Hans': '简体中文', 'en': 'English' };
 
   var I18N = {
     // zh-Hant 的內容就在 index.html 裡（那也是沒有 JS 時看到的東西），
@@ -18,6 +20,8 @@
     // 同一段話存兩份，遲早會改了一邊忘了另一邊。
     'zh-Hant': {
       'spec.osValue': 'Android {v} 以上',
+      'theme.toDark': '切換到深色模式',
+      'theme.toLight': '切換到淺色模式',
       'copied': '已複製',
       'copyFailed': '複製失敗，請手動選取',
       'note.desktop': '你正在用電腦瀏覽。APK 要裝在 Android 手機上，先下載再傳進手機開啟。',
@@ -27,17 +31,23 @@
     'zh-Hans': {
       'html.title': 'Live Translator for Android — 官方 APK 下载',
       'skip': '跳到下载',
-      'brand.sub': 'Android 版',
-      'hero.eyebrow': '官方安装包',
-      'hero.title': '实时语音翻译，装进你的 Android',
+      'nav.home': '首页',
+      'nav.features': '特性',
+      'nav.products': '产品',
+      'nav.language': '语言',
+      'theme.toDark': '切换到深色模式',
+      'theme.toLight': '切换到浅色模式',
+      'back': '查看所有产品',
+      'hero.title': 'Live Translator Android 版',
       'hero.lede': '会议、课堂、直播与跨境协作的实时语音与文字翻译。这里是唯一的官方下载点，其他来源的安装包我们无法担保。',
       'download.cta': '下载 APK',
+      'spec.title': '版本信息',
       'spec.os': '系统要求',
       'spec.abi': '支持架构',
       'spec.pkg': '包名',
       'spec.osValue': 'Android {v} 及以上',
       'changelog.title': '这一版有什么',
-      'mirror.label': '主站打不开时的备用地址：',
+      'mirror.label': '这个网址打不开时的备用地址：',
       'verify.title': '安装前先验一下',
       'verify.intro': '旁加载的风险在于你不知道手上的文件有没有被换过。下面两个值各回答一半：第一个确认文件本身没被动过，第二个确认它确实是我们签的。',
       'verify.file': 'APK 文件 SHA-256',
@@ -75,9 +85,17 @@
       'faq.a5': '有，功能与这一版对齐。网页版不用安装，打开浏览器就能用。',
       'history.title': '历史版本',
       'history.note': '旧版只在需要回退时使用，一般情况请装最新版。',
+      'footer.desc': '用为现代时代设计的智能软件解决方案赋能企业。',
       'footer.web': '网页版',
       'footer.ios': 'iOS 版',
       'footer.manifest': '版本信息 JSON',
+      'footer.resources': '资源',
+      'footer.products': '所有产品',
+      'footer.help': '帮助中心',
+      'footer.team': '认识我们的团队',
+      'footer.contact': '联系',
+      'footer.privacy': '隐私政策',
+      'footer.wecom': '微信客服',
       'note.desktop': '你正在用电脑浏览。APK 要装在 Android 手机上，先下载再传进手机打开。',
       'note.ios': '这是 Android 安装包，iPhone 和 iPad 装不了。请改用 iOS 版或网页版。'
     },
@@ -85,11 +103,17 @@
     'en': {
       'html.title': 'Live Translator for Android — Official APK',
       'skip': 'Skip to download',
-      'brand.sub': 'for Android',
-      'hero.eyebrow': 'Official build',
-      'hero.title': 'Real-time translation, on your Android phone',
+      'nav.home': 'Home',
+      'nav.features': 'Features',
+      'nav.products': 'Products',
+      'nav.language': 'Language',
+      'theme.toDark': 'Switch to dark mode',
+      'theme.toLight': 'Switch to light mode',
+      'back': 'View All Products',
+      'hero.title': 'Live Translator for Android',
       'hero.lede': 'Live speech and text translation for meetings, classes, livestreams and cross-border work. This is the only official download; we cannot vouch for builds from anywhere else.',
       'download.cta': 'Download APK',
+      'spec.title': 'Release details',
       'spec.os': 'Requires',
       'spec.abi': 'Architectures',
       'spec.pkg': 'Package',
@@ -133,9 +157,17 @@
       'faq.a5': 'Yes, with the same feature set. The web version needs no install at all.',
       'history.title': 'Earlier versions',
       'history.note': 'Only for rolling back. Install the latest release unless you have a reason not to.',
+      'footer.desc': 'Empowering businesses with intelligent software solutions designed for the modern era.',
       'footer.web': 'Web app',
       'footer.ios': 'iOS app',
       'footer.manifest': 'Release manifest',
+      'footer.resources': 'Resources',
+      'footer.products': 'All Products',
+      'footer.help': 'Help Center',
+      'footer.team': 'Meet the Team',
+      'footer.contact': 'Contact',
+      'footer.privacy': 'Privacy Policy',
+      'footer.wecom': 'WeCom Support',
       'note.desktop': 'You are on a desktop browser. An APK installs on an Android phone — download it here, then move it to the phone.',
       'note.ios': 'This is an Android package; it will not install on iPhone or iPad. Use the iOS app or the web version instead.'
     }
@@ -152,6 +184,11 @@
     for (var i = 0; i < nodes.length; i++) {
       var key = nodes[i].getAttribute('data-i18n');
       if (dict[key] == null) dict[key] = nodes[i].textContent.trim();
+    }
+    var labelled = document.querySelectorAll('[data-i18n-aria]');
+    for (var j = 0; j < labelled.length; j++) {
+      var ariaKey = labelled[j].getAttribute('data-i18n-aria');
+      if (dict[ariaKey] == null) dict[ariaKey] = labelled[j].getAttribute('aria-label');
     }
     if (dict['html.title'] == null) dict['html.title'] = document.title;
   }
@@ -194,9 +231,15 @@
       nodes[i].textContent = t(nodes[i].getAttribute('data-i18n'));
     }
 
-    var buttons = document.querySelectorAll('.lang button');
+    var labelled = document.querySelectorAll('[data-i18n-aria]');
+    for (var k = 0; k < labelled.length; k++) {
+      labelled[k].setAttribute('aria-label', t(labelled[k].getAttribute('data-i18n-aria')));
+    }
+
+    setText('#lang-name', LANG_NAMES[lang]);
+    var buttons = document.querySelectorAll('#lang-menu button');
     for (var j = 0; j < buttons.length; j++) {
-      buttons[j].setAttribute('aria-pressed', String(buttons[j].getAttribute('data-lang') === lang));
+      buttons[j].setAttribute('aria-current', String(buttons[j].getAttribute('data-lang') === lang));
     }
 
     try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* 無痕模式，算了 */ }
@@ -205,6 +248,36 @@
     renderRelease();
     renderHistory();
     renderPlatformNote();
+    renderThemeToggle();
+  }
+
+  function setLangMenu(open) {
+    var menu = $('#lang-menu');
+    var toggle = $('#lang-toggle');
+    if (!menu || !toggle) return;
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
+  /* ---------- theme ---------- */
+
+  // 初始值 theme.js 已經掛在 <html> 上了，這裡只負責切換與按鈕的說明文字。
+  function isDark() {
+    return document.documentElement.classList.contains('dark');
+  }
+
+  function renderThemeToggle() {
+    var btn = $('#theme-toggle');
+    if (btn) btn.setAttribute('aria-label', t(isDark() ? 'theme.toLight' : 'theme.toDark'));
+  }
+
+  function toggleTheme() {
+    var dark = !isDark();
+    var root = document.documentElement;
+    root.classList.toggle('dark', dark);
+    root.classList.toggle('light', !dark);
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) { /* 無痕模式 */ }
+    renderThemeToggle();
   }
 
   /* ---------- release data ---------- */
@@ -241,7 +314,9 @@
     var lang = document.documentElement.getAttribute('data-lang') || 'zh-Hant';
     var notes = r.notes && (r.notes[lang] || r.notes['en']);
     var list = $('#changelog-list');
-    if (list && notes) {
+    var section = $('#changelog');
+    if (list && notes && notes.length) {
+      if (section) section.hidden = false;
       list.textContent = '';
       notes.forEach(function (line) {
         var li = document.createElement('li');
@@ -348,9 +423,23 @@
   /* ---------- wiring ---------- */
 
   document.addEventListener('click', function (event) {
-    var langBtn = event.target.closest('.lang button');
+    var langBtn = event.target.closest('#lang-menu button');
     if (langBtn) {
       applyLang(langBtn.getAttribute('data-lang'));
+      setLangMenu(false);
+      $('#lang-toggle').focus();
+      return;
+    }
+
+    if (event.target.closest('#lang-toggle')) {
+      setLangMenu($('#lang-menu').hidden);
+      return;
+    }
+    // 點選單以外的任何地方都收起來
+    setLangMenu(false);
+
+    if (event.target.closest('#theme-toggle')) {
+      toggleTheme();
       return;
     }
 
@@ -365,9 +454,17 @@
     }
   });
 
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !$('#lang-menu').hidden) {
+      setLangMenu(false);
+      $('#lang-toggle').focus();
+    }
+  });
+
   captureDefaults();
   applyLang(detect());
-  renderPlatformNote();
+  $('#lang').hidden = false;
+  $('#theme-toggle').hidden = false;
 
   // version.json 是版本資訊的唯一來源；HTML 裡那份只是它抓不到時的後備，
   // 所以抓失敗就安靜地留著頁面原本的值，不要清空或報錯。
