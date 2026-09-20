@@ -1,9 +1,10 @@
 /*
- * 下載頁的全部行為（深淺色的初始判斷在 theme.js，得在繪製前跑）。四件事：
+ * 下載頁的全部行為（深淺色的初始判斷在 theme.js，得在繪製前跑）。五件事：
  *   1. 從 version.json 把版本／大小／雜湊填進頁面，HTML 裡的值只是沒有 JS 時的後備。
  *   2. 三種語言切換，記在 localStorage。
- *   3. 深淺色切換，跟主站一樣記在 localStorage 的 theme。
- *   4. 複製雜湊、提醒非 Android 訪客。
+ *   3. 指回主站的連結跟著語言換 /zh/ 或 /en/（主站每頁都有兩份）。
+ *   4. 深淺色切換，跟主站一樣記在 localStorage 的 theme。
+ *   5. 複製雜湊、提醒非 Android 訪客。
  *
  * 沒有建置步驟，所以刻意只用瀏覽器原生 API。
  */
@@ -13,6 +14,39 @@
   var LANGS = ['zh-Hant', 'zh-Hans', 'en'];
   var STORAGE_KEY = 'lt-download-lang';
   var LANG_NAMES = { 'zh-Hant': '繁體中文', 'zh-Hans': '简体中文', 'en': 'English' };
+
+  // 主站的每一頁都有 /zh/ 與 /en/ 兩份，所以指回主站的連結要跟著這裡的語言換。
+  // 鍵是 HTML 裡的 data-site，值是去掉語言前綴之後的路徑。兩種中文都去 /zh/。
+  var SITE = 'https://aieverywhere.top/';
+  var SITE_LINKS = {
+    'home': '',
+    'products': 'products/',
+    'capabilities': '#capabilities',
+    'support': 'support/',
+    'contributors': 'contributors/',
+    'translate-plus': 'products/translate-plus/'
+  };
+
+  // 一鍵匯入 Obtainium 的設定。Obtainium 認得 obtainium://app/<URL 編碼過的 JSON>，
+  // 欄位就是它匯出設定時的那些；additionalSettings 是一個「JSON 字串」而不是物件，
+  // 那邊是直接 jsonDecode 它的，寫成物件會匯入失敗。
+  //
+  // 這串刻意不寫在 index.html 的 href 裡，而是在這裡塞進按鈕：Obtainium 追這一頁的
+  // 方式是抓頁面上每一個 <a> 的 href、解碼後丟進 Uri.parse，而這串解碼出來有大括號、
+  // 引號與空白。為了一顆按鈕去賭它每個版本都吃得下不划算——真出事是所有用 Obtainium
+  // 的人都收不到更新。沒有 JS 時按鈕不出現，手動填的三個欄位本來就印在頁面上。
+  var OBTAINIUM_APP = {
+    id: 'top.aieverywhere.livetranslator',
+    url: 'https://download.aieverywhere.top/',
+    author: 'AI Everywhere',
+    name: 'Live Translator',
+    // 版本從 APK 的檔名讀，不然 Obtainium 只能拿雜湊當版本號，
+    // 每次檢查都得先下載一段檔案，畫面上也只會看到一串十六進位。
+    additionalSettings: JSON.stringify({
+      versionExtractionRegEx: 'LiveTranslator-([0-9.]+)\\.apk',
+      matchGroupToUse: '1'
+    })
+  };
 
   var I18N = {
     // zh-Hant 的內容就在 index.html 裡（那也是沒有 JS 時看到的東西），
@@ -31,22 +65,32 @@
     'zh-Hans': {
       'html.title': 'Live Translator for Android — 官方 APK 下载',
       'skip': '跳到下载',
-      'nav.home': '首页',
-      'nav.features': '特性',
       'nav.products': '产品',
+      'nav.capabilities': '能力',
+      'nav.support': '支持',
+      'nav.contributors': '参与制作',
       'nav.language': '语言',
       'theme.toDark': '切换到深色模式',
       'theme.toLight': '切换到浅色模式',
-      'back': '查看所有产品',
-      'hero.title': 'Live Translator Android 版',
+      'breadcrumb.label': '面包屑导航',
+      'breadcrumb.home': '首页',
+      'breadcrumb.products': '产品',
+      'breadcrumb.current': 'Android 下载',
+      'hero.eyebrow': 'Android · 官方安装包',
       'hero.lede': '会议、课堂、直播与跨境协作的实时语音与文字翻译。这里是唯一的官方下载点，其他来源的安装包我们无法担保。',
+      'hero.signed': '同一把密钥签名',
       'download.cta': '下载 APK',
+      'download.verify': '先看校验值',
       'spec.title': '版本信息',
+      'spec.source': '全部取自 version.json',
       'spec.os': '系统要求',
       'spec.abi': '支持架构',
       'spec.pkg': '包名',
+      'spec.file': '文件',
       'spec.osValue': 'Android {v} 及以上',
       'changelog.title': '这一版有什么',
+      'source.title': '官方来源只有这两个网址',
+      'source.body': '这一页和下面的备用网址是我们唯一自己发布 APK 的地方。App 没有上架 Google Play，任何第三方市场上的「Live Translator」都不是我们放的，也不会通过上面的签名证书比对。',
       'mirror.label': '这个网址打不开时的备用地址：',
       'verify.title': '安装前先验一下',
       'verify.intro': '旁加载的风险在于你不知道手上的文件有没有被换过。下面两个值各回答一半：第一个确认文件本身没被动过，第二个确认它确实是我们签的。',
@@ -72,6 +116,15 @@
       'perm.mic': '录下你说的话拿去识别与翻译。不开就只能用文字翻译。',
       'perm.net': '翻译在服务器上做，必须联网。',
       'perm.state': '判断断线，好决定要不要重连。',
+      'obtainium.title': '用 Obtainium 追新版',
+      'obtainium.intro': '这个 App 不在任何商店里，所以系统不会帮你更新。App 自己会在启动时看一眼这里有没有新版，但文件还是得你手动装。你如果已经在用 Obtainium，把这一页加成来源就行——它会盯着这一页，出新版时通知你。',
+      'obtainium.cta': '在 Obtainium 中打开',
+      'obtainium.hint': '这颗按钮只有在装了 Obtainium 的手机上才有反应。自己手动加也可以，填这三个字段——尤其是正则：少了它，Obtainium 只能拿文件的哈希当版本号，那个值每次算出来都可能不一样，于是会一直弹出其实并不存在的更新。',
+      'obtainium.source': '来源网址',
+      'obtainium.regex': '版本提取正则',
+      'obtainium.group': 'Match group',
+      'obtainium.note': 'Obtainium 不是我们做的，我们也不发布它，它在自己的仓库：',
+      'obtainium.trust': '它下载的就是这一页上的同一个文件，覆盖安装时挡不挡得住冒牌货仍然是 Android 在比对签名——换句话说，它省的是每次手动检查，不是你对来源的判断。',
       'faq.title': '常见问题',
       'faq.q1': '为什么不上 Google Play？',
       'faq.a1': '主要用户在中国大陆，那里的手机大多没有 Play 商店，上架也到不了他们手上。自行发布的 APK 反而是所有地区都能装的那一个。',
@@ -90,12 +143,10 @@
       'footer.ios': 'iOS 版',
       'footer.manifest': '版本信息 JSON',
       'footer.resources': '资源',
-      'footer.products': '所有产品',
-      'footer.help': '帮助中心',
-      'footer.team': '认识我们的团队',
       'footer.contact': '联系',
       'footer.privacy': '隐私政策',
       'footer.wecom': '微信客服',
+      'footer.copyright': '© 2026 北京紫洛兰科技有限公司 版权所有。',
       'note.desktop': '你正在用电脑浏览。APK 要装在 Android 手机上，先下载再传进手机打开。',
       'note.ios': '这是 Android 安装包，iPhone 和 iPad 装不了。请改用 iOS 版或网页版。'
     },
@@ -103,22 +154,32 @@
     'en': {
       'html.title': 'Live Translator for Android — Official APK',
       'skip': 'Skip to download',
-      'nav.home': 'Home',
-      'nav.features': 'Features',
       'nav.products': 'Products',
+      'nav.capabilities': 'Capabilities',
+      'nav.support': 'Support',
+      'nav.contributors': 'Contributors',
       'nav.language': 'Language',
       'theme.toDark': 'Switch to dark mode',
       'theme.toLight': 'Switch to light mode',
-      'back': 'View All Products',
-      'hero.title': 'Live Translator for Android',
+      'breadcrumb.label': 'Breadcrumb',
+      'breadcrumb.home': 'Home',
+      'breadcrumb.products': 'Products',
+      'breadcrumb.current': 'Android download',
+      'hero.eyebrow': 'Android · Official build',
       'hero.lede': 'Live speech and text translation for meetings, classes, livestreams and cross-border work. This is the only official download; we cannot vouch for builds from anywhere else.',
+      'hero.signed': 'One signing key throughout',
       'download.cta': 'Download APK',
+      'download.verify': 'See the checksums',
       'spec.title': 'Release details',
+      'spec.source': 'Everything here comes from version.json',
       'spec.os': 'Requires',
       'spec.abi': 'Architectures',
       'spec.pkg': 'Package',
+      'spec.file': 'File',
       'spec.osValue': 'Android {v} or later',
       'changelog.title': "What's in this release",
+      'source.title': 'Two addresses, and nothing else, are official',
+      'source.body': 'This page and the mirror below are the only places we publish the APK ourselves. The app is not on Google Play, so a "Live Translator" on any third-party store did not come from us — and it will not match the signing certificate above.',
       'mirror.label': 'Mirror, if this domain is unreachable:',
       'verify.title': 'Verify before you install',
       'verify.intro': 'The risk in sideloading is not knowing whether the file you hold is the file we built. These two values each answer half of that: the first says the file is untouched, the second says we signed it.',
@@ -144,6 +205,15 @@
       'perm.mic': 'Captures what you say for recognition and translation. Without it, only text translation works.',
       'perm.net': 'Translation runs on our servers, so the app needs a connection.',
       'perm.state': 'Detects dropped connections so the app knows when to reconnect.',
+      'obtainium.title': 'Track releases with Obtainium',
+      'obtainium.intro': 'The app is in no store, so nothing updates it for you. It checks this page at launch and tells you when a release is out, but installing the file is still your move. If you already use Obtainium, add this page as a source and it will watch the page for you.',
+      'obtainium.cta': 'Open in Obtainium',
+      'obtainium.hint': 'The button only does something on a phone with Obtainium installed. Adding it by hand takes the same three fields — the regex above all: without it Obtainium falls back to hashing the file for a version number, that value can come out different on every check, and you get update prompts for a release that does not exist.',
+      'obtainium.source': 'Source URL',
+      'obtainium.regex': 'Version extraction regex',
+      'obtainium.group': 'Match group',
+      'obtainium.note': 'Obtainium is not ours and we do not distribute it. It lives in its own repository:',
+      'obtainium.trust': 'It downloads the same file this page links to, and Android still does the signature check that keeps an impostor from installing over your copy — what it saves you is the manual check each time, not the judgement about the source.',
       'faq.title': 'Questions',
       'faq.q1': 'Why not Google Play?',
       'faq.a1': 'Most of our users are in mainland China, where phones generally ship without the Play Store — listing there would not reach them. A self-hosted APK is the one build that installs everywhere.',
@@ -162,12 +232,10 @@
       'footer.ios': 'iOS app',
       'footer.manifest': 'Release manifest',
       'footer.resources': 'Resources',
-      'footer.products': 'All Products',
-      'footer.help': 'Help Center',
-      'footer.team': 'Meet the Team',
       'footer.contact': 'Contact',
       'footer.privacy': 'Privacy Policy',
       'footer.wecom': 'WeCom Support',
+      'footer.copyright': '© 2026 Beijing Zilolan Technology Co., Ltd. All rights reserved.',
       'note.desktop': 'You are on a desktop browser. An APK installs on an Android phone — download it here, then move it to the phone.',
       'note.ios': 'This is an Android package; it will not install on iPhone or iPad. Use the iOS app or the web version instead.'
     }
@@ -236,6 +304,12 @@
       labelled[k].setAttribute('aria-label', t(labelled[k].getAttribute('data-i18n-aria')));
     }
 
+    applySiteLinks(lang);
+
+    // 備案號是中國大陸的法規要求，跟主站一樣只出現在中文版。
+    var icp = $('#icp');
+    if (icp) icp.hidden = lang === 'en';
+
     setText('#lang-name', LANG_NAMES[lang]);
     var buttons = document.querySelectorAll('#lang-menu button');
     for (var j = 0; j < buttons.length; j++) {
@@ -249,6 +323,22 @@
     renderHistory();
     renderPlatformNote();
     renderThemeToggle();
+  }
+
+  function applySiteLinks(lang) {
+    var prefix = SITE + (lang === 'en' ? 'en/' : 'zh/');
+    var nodes = document.querySelectorAll('[data-site]');
+    for (var i = 0; i < nodes.length; i++) {
+      var path = SITE_LINKS[nodes[i].getAttribute('data-site')];
+      if (path != null) nodes[i].setAttribute('href', prefix + path);
+    }
+  }
+
+  function wireObtainium() {
+    var link = $('#obtainium-link');
+    if (!link) return;
+    link.setAttribute('href', 'obtainium://app/' + encodeURIComponent(JSON.stringify(OBTAINIUM_APP)));
+    link.hidden = false;
   }
 
   function setLangMenu(open) {
@@ -465,6 +555,7 @@
   applyLang(detect());
   $('#lang').hidden = false;
   $('#theme-toggle').hidden = false;
+  wireObtainium();
 
   // version.json 是版本資訊的唯一來源；HTML 裡那份只是它抓不到時的後備，
   // 所以抓失敗就安靜地留著頁面原本的值，不要清空或報錯。

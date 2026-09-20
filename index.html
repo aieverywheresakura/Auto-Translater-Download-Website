@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Live Translator for Android — 官方 APK 下載</title>
 <meta name="description" content="Live Translator Android 版官方 APK 下載。即時語音翻譯、文字翻譯、會話歷史與 AI 總結，支援 Android 8.0 以上，附 SHA-256 校驗值與簽名指紋。">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#11151a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1014" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Beijing Zilolan Technology Co., Ltd.">
 <link rel="canonical" href="https://download.aieverywhere.top/">
@@ -44,27 +44,25 @@
 
 <a class="skip-link" href="#download" data-i18n="skip">跳到下載</a>
 
-<!-- 頁首頁尾照主站 aieverywhere.top 的元件刻，連結都指回主站 -->
+<!-- 頁首頁尾照主站 aieverywhere.top 的元件刻，連結都指回主站。
+     主站的頁面分成 /zh/ 與 /en/ 兩套，href 寫的是繁體時要去的那一套，
+     換語言時由 js/main.js 依 data-site 改寫。 -->
 <header class="site-header">
   <div class="container header-inner">
-    <a class="brand" href="https://aieverywhere.top/">
+    <a class="brand" href="https://aieverywhere.top/zh/" data-site="home">
       <span class="logo" role="img" aria-label="AI Everywhere"></span>
       <span class="brand-name">AI Everywhere</span>
     </a>
 
     <nav class="primary-nav" aria-label="AI Everywhere">
-      <a href="https://aieverywhere.top/#top" data-i18n="nav.home">首頁</a>
-      <a href="https://aieverywhere.top/#features" data-i18n="nav.features">特性</a>
-      <a href="https://aieverywhere.top/#showcase" data-i18n="nav.products">產品</a>
+      <a href="https://aieverywhere.top/zh/products/" data-site="products" data-i18n="nav.products">產品</a>
+      <a href="https://aieverywhere.top/zh/#capabilities" data-site="capabilities" data-i18n="nav.capabilities">能力</a>
+      <a href="https://aieverywhere.top/zh/support/" data-site="support" data-i18n="nav.support">支援</a>
+      <a href="https://aieverywhere.top/zh/contributors/" data-site="contributors" data-i18n="nav.contributors">參與製作</a>
     </nav>
 
     <!-- 兩個按鈕都要 JS 才有作用，沒有 JS 就不出現 -->
     <div class="header-actions">
-      <button type="button" class="icon-btn theme-toggle" id="theme-toggle" hidden>
-        <svg class="icon i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-        <svg class="icon i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
-      </button>
-
       <div class="lang" id="lang" hidden>
         <button type="button" class="chip lang-toggle" id="lang-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="lang-menu" data-i18n-aria="nav.language" aria-label="語言">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
@@ -77,173 +75,258 @@
           <button type="button" data-lang="en" lang="en">English</button>
         </div>
       </div>
+
+      <button type="button" class="icon-btn theme-toggle" id="theme-toggle" hidden>
+        <svg class="icon i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg class="icon i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </button>
     </div>
   </div>
 </header>
 
 <main class="site-page">
   <div class="container">
-    <div class="page">
 
-      <a class="back-link" href="https://aieverywhere.top/products">
-        <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-        <span data-i18n="back">查看所有產品</span>
-      </a>
+    <nav class="breadcrumb" data-i18n-aria="breadcrumb.label" aria-label="麵包屑導覽">
+      <a href="https://aieverywhere.top/zh/" data-site="home" data-i18n="breadcrumb.home">首頁</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="https://aieverywhere.top/zh/products/" data-site="products" data-i18n="breadcrumb.products">產品</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="https://aieverywhere.top/zh/products/translate-plus/" data-site="translate-plus">Translate +</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="current" data-i18n="breadcrumb.current">Android 下載</span>
+    </nav>
 
-      <article class="panel" id="download">
-        <header class="hero">
-          <div class="app-icon"><img src="assets/icon-192.png" alt="" width="96" height="96"></div>
-          <h1 data-i18n="hero.title">Live Translator Android 版</h1>
+    <header class="hero" id="download">
+      <div class="hero-main">
+        <div>
+          <p class="eyebrow" data-i18n="hero.eyebrow">Android · 官方安裝檔</p>
+          <h1>Live Translator</h1>
           <p class="hero-lede" data-i18n="hero.lede">會議、課堂、直播與跨境協作的即時語音與文字翻譯。這裡是唯一的官方下載點，其他來源的安裝檔我們無法擔保。</p>
           <p class="hero-meta">
-            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48 19.44 6.3a.38.38 0 0 0-.66-.38l-1.86 3.22A11.4 11.4 0 0 0 12 8.1c-1.77 0-3.43.39-4.92 1.04L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52ZM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"/></svg>
-            <span>Android</span>
-            <span class="sep" aria-hidden="true">·</span>
             <span id="version-badge">v2.4.1</span>
-            <span class="sep" aria-hidden="true">·</span>
+            <span class="sep" aria-hidden="true">/</span>
             <span id="release-date">2026-09-15</span>
+            <span class="sep" aria-hidden="true">/</span>
+            <span data-i18n="hero.signed">同一把金鑰簽名</span>
           </p>
+        </div>
 
-          <a class="btn btn-download" id="download-btn" href="download/android/LiveTranslator-2.4.1.apk" download>
-            <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48 19.44 6.3a.38.38 0 0 0-.66-.38l-1.86 3.22A11.4 11.4 0 0 0 12 8.1c-1.77 0-3.43.39-4.92 1.04L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52ZM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"/></svg>
-            <span data-i18n="download.cta">下載 APK</span>
-            <span class="btn-sub" id="download-meta">12.6 MB</span>
-          </a>
+        <div>
+          <div class="hero-actions">
+            <a class="btn" id="download-btn" href="download/android/LiveTranslator-2.4.1.apk" download>
+              <svg class="icon-lg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48 19.44 6.3a.38.38 0 0 0-.66-.38l-1.86 3.22A11.4 11.4 0 0 0 12 8.1c-1.77 0-3.43.39-4.92 1.04L5.22 5.92a.38.38 0 0 0-.66.38L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52ZM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"/></svg>
+              <span data-i18n="download.cta">下載 APK</span>
+              <span class="btn-sub" id="download-meta">12.6 MB</span>
+            </a>
+            <a class="btn-outline" href="#verify">
+              <span data-i18n="download.verify">先看校驗值</span>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+            </a>
+          </div>
 
           <p class="platform-note" id="platform-note" hidden></p>
+        </div>
+      </div>
 
-          <p class="mirror">
-            <span data-i18n="mirror.label">這個網址連不上時的備援：</span>
-            <a href="https://aieverywhere.pages.dev/">aieverywhere.pages.dev</a>
+      <div class="hero-aside">
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="app-icon"><img src="assets/icon-192.png" alt="" width="96" height="96"></span>
+            <div>
+              <h2 data-i18n="spec.title">版本資訊</h2>
+              <p data-i18n="spec.source">全部取自 version.json</p>
+            </div>
+          </div>
+          <dl class="spec">
+            <div><dt data-i18n="spec.os">系統需求</dt><dd id="spec-os">Android 8.0 以上</dd></div>
+            <div><dt data-i18n="spec.abi">支援架構</dt><dd id="spec-abi">arm64-v8a · armeabi-v7a · x86 · x86_64</dd></div>
+            <div><dt data-i18n="spec.pkg">套件名稱</dt><dd><code>top.<wbr>aieverywhere.<wbr>livetranslator</code></dd></div>
+          </dl>
+          <p class="file-card-foot">
+            <span data-i18n="spec.file">檔案</span>
+            <code>LiveTranslator-2.4.1.apk</code>
           </p>
-        </header>
-
-        <div class="panel-body">
-          <section>
-            <h2 data-i18n="spec.title">版本資訊</h2>
-            <dl class="spec">
-              <div><dt data-i18n="spec.os">系統需求</dt><dd id="spec-os">Android 8.0 以上</dd></div>
-              <div><dt data-i18n="spec.abi">支援架構</dt><dd id="spec-abi">arm64-v8a · armeabi-v7a · x86 · x86_64</dd></div>
-              <div><dt data-i18n="spec.pkg">套件名稱</dt><dd><code>top.<wbr>aieverywhere.<wbr>livetranslator</code></dd></div>
-            </dl>
-          </section>
-
-          <!-- 更新說明只在 version.json 裡，抓到才顯示 -->
-          <section id="changelog" hidden>
-            <h2 data-i18n="changelog.title">這一版有什麼</h2>
-            <ul class="checklist" id="changelog-list"></ul>
-          </section>
         </div>
-      </article>
+      </div>
+    </header>
 
-      <section class="panel" id="verify">
-        <div class="panel-body">
-          <h2 data-i18n="verify.title">安裝前先驗一下</h2>
-          <p class="prose" data-i18n="verify.intro">側載的風險在於你不知道手上的檔案有沒有被換過。下面兩個值可以各自回答一半：第一個確認檔案本身沒被動過，第二個確認它確實是我們簽的。</p>
+    <!-- 更新說明只在 version.json 裡，抓到才顯示 -->
+    <section class="row lede-row" id="changelog" hidden>
+      <div>
+        <p class="eyebrow">01</p>
+        <h2 data-i18n="changelog.title">這一版有什麼</h2>
+      </div>
+      <div>
+        <ul class="checklist" id="changelog-list"></ul>
+      </div>
+    </section>
 
-          <div class="hash">
-            <div class="hash-head">
-              <h3 data-i18n="verify.file">APK 檔案 SHA-256</h3>
-              <button type="button" class="chip copy" data-copy="#sha-file" data-i18n="copy">複製</button>
-            </div>
-            <code id="sha-file">b958da0b62868495d0440d42a04012dbe6b3833f52316d5335e0d450602de376</code>
+    <section class="row lede-row" id="verify">
+      <div>
+        <p class="eyebrow">02</p>
+        <h2 data-i18n="verify.title">安裝前先驗一下</h2>
+        <p class="prose" data-i18n="verify.intro">側載的風險在於你不知道手上的檔案有沒有被換過。下面兩個值可以各自回答一半：第一個確認檔案本身沒被動過，第二個確認它確實是我們簽的。</p>
+      </div>
+      <div>
+        <div class="hash">
+          <div class="hash-head">
+            <h3 data-i18n="verify.file">APK 檔案 SHA-256</h3>
+            <button type="button" class="chip copy" data-copy="#sha-file" data-i18n="copy">複製</button>
           </div>
+          <code id="sha-file">b958da0b62868495d0440d42a04012dbe6b3833f52316d5335e0d450602de376</code>
+        </div>
 
-          <div class="hash">
-            <div class="hash-head">
-              <h3 data-i18n="verify.cert">簽名憑證 SHA-256</h3>
-              <button type="button" class="chip copy" data-copy="#sha-cert" data-i18n="copy">複製</button>
-            </div>
-            <code id="sha-cert">5f115aedaff29add0e2f5d175ee01b9e6699b324d19908178bda72722e078aac</code>
-            <p class="muted" id="cert-subject">CN=AI Everywhere, O=AI Everywhere, C=CN</p>
+        <div class="hash">
+          <div class="hash-head">
+            <h3 data-i18n="verify.cert">簽名憑證 SHA-256</h3>
+            <button type="button" class="chip copy" data-copy="#sha-cert" data-i18n="copy">複製</button>
           </div>
+          <code id="sha-cert">5f115aedaff29add0e2f5d175ee01b9e6699b324d19908178bda72722e078aac</code>
+          <p class="muted" id="cert-subject">CN=AI Everywhere, O=AI Everywhere, C=CN</p>
+        </div>
 
-          <details>
-            <summary data-i18n="verify.how">怎麼比對</summary>
-            <p data-i18n="verify.howFile">檔案雜湊在自己的電腦上算：</p>
-            <pre><code>macOS / Linux:  shasum -a 256 LiveTranslator-2.4.1.apk
+        <details>
+          <summary data-i18n="verify.how">怎麼比對</summary>
+          <p data-i18n="verify.howFile">檔案雜湊在自己的電腦上算：</p>
+          <pre><code>macOS / Linux:  shasum -a 256 LiveTranslator-2.4.1.apk
 Windows:        certutil -hashfile LiveTranslator-2.4.1.apk SHA256</code></pre>
-            <p data-i18n="verify.howCert">憑證指紋要用 Android SDK 的 apksigner，它讀的是簽名區塊而不是檔案內容：</p>
-            <pre><code>apksigner verify --print-certs LiveTranslator-2.4.1.apk</code></pre>
-            <p class="muted" data-i18n="verify.note">憑證指紋跨版本不變。哪天它變了，代表簽名金鑰換了——那必須是我們公開說明過的事，否則就別裝。</p>
-          </details>
-        </div>
-      </section>
+          <p data-i18n="verify.howCert">憑證指紋要用 Android SDK 的 apksigner，它讀的是簽名區塊而不是檔案內容：</p>
+          <pre><code>apksigner verify --print-certs LiveTranslator-2.4.1.apk</code></pre>
+          <p class="muted" data-i18n="verify.note">憑證指紋跨版本不變。哪天它變了，代表簽名金鑰換了——那必須是我們公開說明過的事，否則就別裝。</p>
+        </details>
+      </div>
+    </section>
 
-      <section class="panel" id="install">
-        <div class="panel-body">
-          <h2 data-i18n="install.title">安裝步驟</h2>
-          <ol class="steps">
-            <li>
+    <section class="row" id="install">
+      <div>
+        <p class="eyebrow">03</p>
+        <h2 data-i18n="install.title">安裝步驟</h2>
+        <ol class="steps">
+          <li>
+            <div>
               <h3 data-i18n="install.s1.t">下載 APK</h3>
               <p data-i18n="install.s1.d">用手機的瀏覽器直接開這一頁最省事。在電腦上下載的話，記得把檔案傳進手機再開啟。</p>
-            </li>
-            <li>
+            </div>
+          </li>
+          <li>
+            <div>
               <h3 data-i18n="install.s2.t">允許這個來源安裝</h3>
               <p data-i18n="install.s2.d">點開下載好的檔案，系統會擋一次。照著提示進「設定 → 安裝未知應用程式」，把當下這個瀏覽器或檔案管理器打開權限，再回來繼續。這個開關是給那一個 App 的，不是全域的。</p>
-            </li>
-            <li>
+            </div>
+          </li>
+          <li>
+            <div>
               <h3 data-i18n="install.s3.t">安裝並登入</h3>
               <p data-i18n="install.s3.d">安裝完第一次啟動會要求麥克風權限，那是語音輸入用的。沒有帳號的話可以直接在 App 內註冊。</p>
-            </li>
-          </ol>
-
-          <section>
-            <h2 data-i18n="perm.title">App 要哪些權限</h2>
-            <div class="table-wrap">
-              <table class="perms">
-                <thead><tr><th data-i18n="perm.h1">權限</th><th data-i18n="perm.h2">用途</th></tr></thead>
-                <tbody>
-                  <tr><td><code>RECORD_AUDIO</code></td><td data-i18n="perm.mic">錄下你說的話拿去辨識與翻譯。不開就只能用文字翻譯。</td></tr>
-                  <tr><td><code>INTERNET</code></td><td data-i18n="perm.net">翻譯在伺服器上做，必須連網。</td></tr>
-                  <tr><td><code>ACCESS_NETWORK_STATE</code></td><td data-i18n="perm.state">判斷斷線，好決定要不要重連。</td></tr>
-                </tbody>
-              </table>
             </div>
-          </section>
+          </li>
+        </ol>
+      </div>
+
+      <div>
+        <p class="eyebrow">04</p>
+        <h2 data-i18n="perm.title">App 要哪些權限</h2>
+        <div class="table-wrap">
+          <table class="perms">
+            <thead><tr><th data-i18n="perm.h1">權限</th><th data-i18n="perm.h2">用途</th></tr></thead>
+            <tbody>
+              <tr><td><code>RECORD_AUDIO</code></td><td data-i18n="perm.mic">錄下你說的話拿去辨識與翻譯。不開就只能用文字翻譯。</td></tr>
+              <tr><td><code>INTERNET</code></td><td data-i18n="perm.net">翻譯在伺服器上做，必須連網。</td></tr>
+              <tr><td><code>ACCESS_NETWORK_STATE</code></td><td data-i18n="perm.state">判斷斷線，好決定要不要重連。</td></tr>
+            </tbody>
+          </table>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="panel" id="faq">
-        <div class="panel-body">
-          <h2 data-i18n="faq.title">常見問題</h2>
-
-          <details>
-            <summary data-i18n="faq.q1">為什麼不上 Google Play？</summary>
-            <p data-i18n="faq.a1">主要使用者在中國大陸，那裡的手機大多沒有 Play 商店，上架也到不了他們手上。自行發佈的 APK 反而是所有地區都能裝的那一個。</p>
-          </details>
-
-          <details>
-            <summary data-i18n="faq.q2">系統說「這個檔案可能有害」，正常嗎？</summary>
-            <p data-i18n="faq.a2">正常。Android 對所有不是從商店來的安裝檔都這樣提示，它警告的是來源不明，不是檔案本身有問題。你可以先比對上面的 SHA-256 再決定要不要繼續。</p>
-          </details>
-
-          <details>
-            <summary data-i18n="faq.q3">中國大陸的手機能用嗎？</summary>
-            <p data-i18n="faq.a3">能。App 完全不依賴 Google Play 服務，預設的語音辨識走我們自己的伺服器。個人資料頁裡另一個「裝置端辨識」選項要靠手機自己的語音辨識服務，沒有的機器會自動變成灰色，那是預期行為。</p>
-          </details>
-
-          <details>
-            <summary data-i18n="faq.q4">更新要先解除安裝嗎？</summary>
-            <p data-i18n="faq.a4">不用。每一版都用同一把金鑰簽名，直接覆蓋安裝就好，資料和登入狀態都會留著。反過來說，如果系統拒絕覆蓋並說簽章不符，那個檔案就不是我們發的。</p>
-          </details>
-
-          <details>
-            <summary data-i18n="faq.q5">有 iOS 版嗎？</summary>
-            <p data-i18n="faq.a5">有，功能與這一版對齊。網頁版不用安裝，開瀏覽器就能用。</p>
-          </details>
+    <!-- 一鍵匯入的按鈕要 JS 才會出現，原因見 js/main.js 的 OBTAINIUM_APP -->
+    <section class="row lede-row" id="obtainium">
+      <div>
+        <p class="eyebrow">05</p>
+        <h2 data-i18n="obtainium.title">用 Obtainium 追新版</h2>
+        <p class="prose" data-i18n="obtainium.intro">這個 App 不在任何商店裡，所以系統不會幫你更新。App 自己會在啟動時看一眼這裡有沒有新版，但檔案還是得你手動裝。你如果已經在用 Obtainium，把這一頁加成來源就行——它會盯著這一頁，出新版時通知你。</p>
+      </div>
+      <div>
+        <div class="actions">
+          <a class="btn-outline" id="obtainium-link" hidden>
+            <span data-i18n="obtainium.cta">在 Obtainium 中開啟</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+          </a>
         </div>
-      </section>
+        <p class="muted" data-i18n="obtainium.hint">這顆按鈕只有在裝了 Obtainium 的手機上才有反應。自己手動加也可以，填這三個欄位——尤其是正則：少了它，Obtainium 只能拿檔案的雜湊當版本號，那個值每次算出來都可能不一樣，於是會一直跳出其實不存在的更新。</p>
 
-      <section class="panel" id="history" hidden>
-        <div class="panel-body">
-          <h2 data-i18n="history.title">歷史版本</h2>
-          <p class="muted" data-i18n="history.note">舊版只在需要退回時使用，一般情況請裝最新版。</p>
-          <ul class="version-list" id="history-list"></ul>
-        </div>
-      </section>
+        <dl class="kv">
+          <div><dt data-i18n="obtainium.source">來源網址</dt><dd><code>https://download.aieverywhere.top/</code></dd></div>
+          <div><dt data-i18n="obtainium.regex">版本擷取正則</dt><dd><code id="obtainium-regex">LiveTranslator-([0-9.]+)\.apk</code></dd></div>
+          <div><dt data-i18n="obtainium.group">Match group</dt><dd><code>1</code></dd></div>
+        </dl>
 
-    </div>
+        <p class="muted">
+          <span data-i18n="obtainium.note">Obtainium 不是我們做的，我們也不發佈它，它在自己的倉庫：</span>
+          <a href="https://github.com/ImranR98/Obtainium" rel="noopener">github.com/ImranR98/Obtainium</a>
+        </p>
+        <p class="muted" data-i18n="obtainium.trust">它下載的就是這一頁上的同一個檔案，覆蓋安裝時擋不擋得住冒牌貨仍然是 Android 在比對簽名——換句話說，它省的是每次手動檢查，不是你對來源的判斷。</p>
+      </div>
+    </section>
+
+    <!-- 主站產品頁那塊反白的「限制與隱私」，這裡放來源與備援 -->
+    <section class="ink-block">
+      <svg class="shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      <div>
+        <h2 data-i18n="source.title">官方來源只有這兩個網址</h2>
+        <p data-i18n="source.body">這一頁與下面的備援網址是我們唯一自己發佈 APK 的地方。App 沒有上架 Google Play，任何第三方市集上的「Live Translator」都不是我們放的，也不會通過上面的簽名憑證比對。</p>
+        <p>
+          <span data-i18n="mirror.label">這個網址連不上時的備援：</span>
+          <a href="https://aieverywhere.pages.dev/">aieverywhere.pages.dev</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="row lede-row" id="faq">
+      <div>
+        <p class="eyebrow">06</p>
+        <h2 data-i18n="faq.title">常見問題</h2>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary data-i18n="faq.q1">為什麼不上 Google Play？</summary>
+          <p data-i18n="faq.a1">主要使用者在中國大陸，那裡的手機大多沒有 Play 商店，上架也到不了他們手上。自行發佈的 APK 反而是所有地區都能裝的那一個。</p>
+        </details>
+
+        <details>
+          <summary data-i18n="faq.q2">系統說「這個檔案可能有害」，正常嗎？</summary>
+          <p data-i18n="faq.a2">正常。Android 對所有不是從商店來的安裝檔都這樣提示，它警告的是來源不明，不是檔案本身有問題。你可以先比對上面的 SHA-256 再決定要不要繼續。</p>
+        </details>
+
+        <details>
+          <summary data-i18n="faq.q3">中國大陸的手機能用嗎？</summary>
+          <p data-i18n="faq.a3">能。App 完全不依賴 Google Play 服務，預設的語音辨識走我們自己的伺服器。個人資料頁裡另一個「裝置端辨識」選項要靠手機自己的語音辨識服務，沒有的機器會自動變成灰色，那是預期行為。</p>
+        </details>
+
+        <details>
+          <summary data-i18n="faq.q4">更新要先解除安裝嗎？</summary>
+          <p data-i18n="faq.a4">不用。每一版都用同一把金鑰簽名，直接覆蓋安裝就好，資料和登入狀態都會留著。反過來說，如果系統拒絕覆蓋並說簽章不符，那個檔案就不是我們發的。</p>
+        </details>
+
+        <details>
+          <summary data-i18n="faq.q5">有 iOS 版嗎？</summary>
+          <p data-i18n="faq.a5">有，功能與這一版對齊。網頁版不用安裝，開瀏覽器就能用。</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="row lede-row" id="history" hidden>
+      <div>
+        <p class="eyebrow">07</p>
+        <h2 data-i18n="history.title">歷史版本</h2>
+      </div>
+      <div>
+        <p class="muted" data-i18n="history.note">舊版只在需要退回時使用，一般情況請裝最新版。</p>
+        <ul class="version-list" id="history-list"></ul>
+      </div>
+    </section>
+
   </div>
 </main>
 
@@ -251,30 +334,33 @@ Windows:        certutil -hashfile LiveTranslator-2.4.1.apk SHA256</code></pre>
   <div class="container">
     <div class="footer-grid">
       <div>
-        <p class="footer-brand"><span class="logo" aria-hidden="true"></span> AI Everywhere</p>
-        <p data-i18n="footer.desc">用為現代時代設計的智慧軟體解決方案賦能企業。</p>
+        <a class="footer-brand" href="https://aieverywhere.top/zh/" data-site="home">
+          <span class="logo" aria-hidden="true"></span>
+          AI Everywhere
+        </a>
+        <p class="footer-desc" data-i18n="footer.desc">用為現代時代設計的智慧軟體解決方案賦能企業。</p>
       </div>
+
       <div>
-        <h4>Live Translator</h4>
+        <h2>Live Translator</h2>
         <ul>
           <li><a href="https://translate.aieverywhere.top/" data-i18n="footer.web">網頁版</a></li>
           <li><a href="download/ios/" data-i18n="footer.ios">iOS 版</a></li>
           <li><a href="version.json" data-i18n="footer.manifest">版本資訊 JSON</a></li>
         </ul>
       </div>
+
       <div>
-        <h4 data-i18n="footer.resources">資源</h4>
+        <h2 data-i18n="footer.resources">資源</h2>
         <ul>
-          <li><a href="https://aieverywhere.top/products" data-i18n="footer.products">所有產品</a></li>
-          <li><a href="https://aieverywhere.top/support" data-i18n="footer.help">幫助中心</a></li>
-          <li><a href="https://aieverywhere.top/contributors" data-i18n="footer.team">認識我們的團隊</a></li>
+          <li><a href="https://aieverywhere.top/zh/products/" data-site="products" data-i18n="nav.products">產品</a></li>
+          <li><a href="https://aieverywhere.top/zh/support/" data-site="support" data-i18n="nav.support">支援</a></li>
+          <li><a href="https://aieverywhere.top/zh/contributors/" data-site="contributors" data-i18n="nav.contributors">參與製作</a></li>
         </ul>
       </div>
+
       <div>
-        <h4 data-i18n="footer.contact">聯絡</h4>
-        <ul>
-          <li><a href="https://aieverywheresakura.github.io/" rel="noopener" data-i18n="footer.privacy">隱私政策</a></li>
-        </ul>
+        <h2 data-i18n="footer.contact">聯絡</h2>
         <div class="social">
           <a href="https://x.com/Ziluolan_AI" rel="noopener" aria-label="AI Everywhere X">
             <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
@@ -291,8 +377,11 @@ Windows:        certutil -hashfile LiveTranslator-2.4.1.apk SHA256</code></pre>
         </div>
       </div>
     </div>
+
     <div class="footer-bottom">
-      <p>© 2026 Beijing Zilolan Technology Co., Ltd. All rights reserved.</p>
+      <p data-i18n="footer.copyright">© 2026 北京紫洛兰科技有限公司 版權所有。</p>
+      <a href="https://aieverywheresakura.github.io/" rel="noopener" data-i18n="footer.privacy">隱私政策</a>
+      <a href="https://beian.miit.gov.cn/" id="icp" rel="noopener">京ICP备2025139194号-1</a>
     </div>
   </div>
 </footer>

@@ -32,6 +32,48 @@ def grab(text, pattern):
     return found.group(1) if found else None
 
 
+def check_obtainium(release, manifest, html):
+    """Obtainium 用檔名讀版本號，所以改了檔名規則就會讓它讀不到版本。
+
+    它抓的是這一頁上唯一那個 .apk 連結，再用 js/main.js 裡的正則從網址取版本。
+    正則對不上時 Obtainium 是直接報錯而不是退回別的辦法，所以那些人會從此收不到
+    更新，而且不會有人來跟我們說——這裡替他們盯著。
+    """
+    with open(os.path.join("js", "main.js"), encoding="utf-8") as handle:
+        js = handle.read()
+
+    pattern = grab(js, r"versionExtractionRegEx: '([^']*)'")
+    if not pattern:
+        problems.append("js/main.js 裡找不到 Obtainium 的 versionExtractionRegEx")
+        return
+    # JS 字串字面值裡的 \\ 到了正則引擎眼裡是一個 \
+    pattern = pattern.replace("\\\\", "\\")
+
+    basename = os.path.basename(release["file"])
+    found = re.search(pattern, basename)
+    if not found:
+        problems.append(
+            "Obtainium 的版本正則 %r 對不上這一版的檔名 %s" % (pattern, basename)
+        )
+    elif found.group(1) != release["version"]:
+        problems.append(
+            "Obtainium 的版本正則從 %s 讀出 %r，但這一版是 %s"
+            % (basename, found.group(1), release["version"])
+        )
+
+    check("js/main.js Obtainium 套件名", grab(js, r"id: '([^']*)'"), manifest["package"])
+    check("index.html 頁面上印的正則", grab(html, r'id="obtainium-regex">([^<]*)<'),
+          pattern)
+
+    # 頁面上只能有一個 .apk 連結：Obtainium 排序後取最後一個，多出來的會讓它抓錯檔案
+    apk_links = re.findall(r'<a\b[^>]*href="([^"]*\.apk)"', html)
+    if len(apk_links) != 1:
+        problems.append(
+            "index.html 上有 %d 個 .apk 連結，Obtainium 只認得出一個時才不會抓錯"
+            % len(apk_links)
+        )
+
+
 def main():
     os.chdir(ROOT)
     with open("version.json", encoding="utf-8") as handle:
@@ -81,6 +123,8 @@ def main():
             problems.append("_redirects 少了 %s 的規則" % alias)
         elif "/" + release["file"] not in line:
             problems.append("_redirects 的 %s 沒有指向 %s" % (alias, release["file"]))
+
+    check_obtainium(release, manifest, html)
 
     for old in manifest.get("history", []):
         if not os.path.isfile(old["file"]):

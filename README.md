@@ -35,7 +35,7 @@ App 沒有上架 Google Play，所以這一頁就是唯一的官方來源。頁�
 ├── assets/               圖示、主站 logo
 ├── css/style.css         照主站 aieverywhere.top 的外觀，見〈外觀〉
 ├── js/theme.js           深淺色的初始判斷，在 <head> 同步載入
-├── js/main.js            讀 version.json、三語切換、深淺色切換、複製雜湊
+├── js/main.js            讀 version.json、三語切換、深淺色切換、複製雜湊、Obtainium 連結
 ├── download/
 │   ├── android/          APK，檔名帶版本號
 │   └── ios/index.html    路標：跳去 App Store（iOS 不可能有自行發佈的安裝檔）
@@ -125,6 +125,7 @@ Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；�
 | 只改文案、樣式、FAQ | 直接改 `index.html` / `css` / `js`，跑 `./tools/check.py`，push |
 | 加一種語言 | `js/main.js` 的 `I18N` 加一份字典、`LANGS` 與 `LANG_NAMES` 加代碼、`#lang-menu` 加一顆按鈕 |
 | 主站改版了 | 見〈外觀〉 |
+| 想改 APK 的檔名規則 | 不只改 `release.py`，Obtainium 靠檔名讀版本，見〈Obtainium〉 |
 | 改了版本號或雜湊 | 別手改。真的手改了，`./tools/check.py` 一定要是綠的才能 push |
 | 換簽名金鑰 | 先在頁面上公告舊指紋要換成什麼，再 `--allow-key-change`（見最後一節） |
 | 要所有人都升到這一版 | 發版時加 `--min-version-code latest`（見〈強制更新〉） |
@@ -153,17 +154,30 @@ Cloudflare Pages 單檔上限 25 MiB，目前的 APK 12.6 MB，還有餘裕；�
 ### 外觀
 
 這一頁是主站 [aieverywhere.top](https://aieverywhere.top/)（倉庫 `aieverywhere-website`）
-的一部分，看起來必須像同一個網站：頁首、頁尾、卡片、按鈕、深淺色都照主站刻，
+的一部分，看起來必須像同一個網站：頁首、頁尾、版面、按鈕、深淺色都照主站刻，
 頁首頁尾的連結指回主站。主站是 Vue + Tailwind，這裡沒有建置步驟，所以不是共用程式碼，
 而是把主站實際用到的值抄進 `css/style.css` 開頭的變數，並在旁邊註明對應的 Tailwind 色名。
 
+現在的主站是編輯式版面，這一頁照著刻：襯線字（`Times New Roman`／宋體）、米白底
+`#f8f7f3`、直角、沒有陰影，整頁用 1px 的 stone-300 切成格子，強調色只有一個
+`#ef4e2f`。版面對著主站的產品頁（`ProductDetailHeader` 與 `ProductDetailContent`）：
+麵包屑、左標題右資訊卡的 hero、兩欄之間一條直線的段落、反白的整塊、最後是 FAQ。
+容器也跟主站一樣不是置中的固定寬度，而是左右留邊的滿版。
+
 主站改版時要跟著改的地方：
 
-- 配色、卡片底色、陰影：`css/style.css` 的 `:root` 與兩段深色變數（兩段內容必須一致）。
+- 配色、線、字體：`css/style.css` 的 `:root` 與兩段深色變數（兩段內容必須一致）。
+- 版面骨架：`css/style.css` 的 `.container`、`.row`、`.hero`、`.ink-block`，
+  對應主站的 `SiteContainer` 與產品頁那幾個元件。
 - 頁首頁尾的連結與文案：`index.html`，簡體與英文在 `js/main.js`。
-  文案盡量沿用主站的翻譯，主站的字串在它建置出來的 `assets/app-*.js` 裡搜得到。
-- Logo：`assets/aieverywhere-logo.svg`，從主站的 `assets/Logo-*.svg` 複製。
+  文案盡量沿用主站的翻譯，主站的字串在 `src/i18n/{en,zh}/` 底下。
+- Logo：`assets/aieverywhere-logo.svg`，從主站的 `src/assets/Logo.svg` 複製。
 - `404.html` 與 `download/ios/index.html` 用同一套頁首頁尾，沒有語言與深淺色按鈕。
+
+主站的每一頁都有 `/zh/` 與 `/en/` 兩份，所以指回主站的連結不能寫死。HTML 裡標
+`data-site="products"` 之類的鍵，`js/main.js` 的 `SITE_LINKS` 決定路徑，換語言時
+一起改寫；HTML 裡寫的是繁體時要去的 `/zh/` 那一份，也就是沒有 JS 時會用到的。
+主站改了路由或錨點（例如首頁的 `#capabilities`），改 `SITE_LINKS` 與 HTML 的 `href`。
 
 深淺色跟主站同一套規則：`<html>` 上掛 `dark` 或 `light`，localStorage 的 `theme`
 有值就照它，沒有就跟系統。主站在另一個網域，存的值不共用。
@@ -249,6 +263,44 @@ App 冷啟動時會讀這裡的 `version.json`（先正式網址，失敗再 `pa
 卡在更新頁，而且沒有任何一版能讓他們通過。App 端遇到這種值也會當作沒設。
 
 這個門檻只管 Android。iOS 走 App Store，不讀這份檔案，兩個平台可以各自調。
+
+## Obtainium
+
+自行發佈的 APK 沒有商店幫忙更新。App 冷啟動時會自己看一眼 `version.json`（見上一節），
+但那只能提醒，檔案還是得使用者手動裝。[Obtainium](https://github.com/ImranR98/Obtainium)
+是補這一段的第三方工具：給它一個網址，它定期去抓、有新版就通知或直接裝。
+
+這一頁不需要為它做任何事就能被追蹤——Obtainium 的 HTML 來源會抓頁面上所有 `<a>` 的
+`href`（相對路徑會補成絕對路徑）、留下 `.apk` 結尾的、排序後取最後一個。這一頁的原始
+HTML 剛好只有一個 APK 連結（歷史版本是 JS 畫出來的，它看不到），所以不會抓錯。
+
+頁面上的〈用 Obtainium 追新版〉那一段給兩種人：按一下就匯入的，以及自己手動填的。
+兩者填的是同一組值：
+
+| 欄位 | 值 |
+| --- | --- |
+| 來源網址 | `https://download.aieverywhere.top/` |
+| 版本擷取正則 | `LiveTranslator-([0-9.]+)\.apk` |
+| Match group | `1` |
+
+正則是必要的：沒有它 Obtainium 只能拿雜湊當版本號（`partialAPKHash`），
+每次檢查都得先下載一段 APK，使用者看到的「版本」也只是一串十六進位。
+
+### 為什麼那串連結在 js/main.js 而不是 href 裡
+
+一鍵匯入的格式是 `obtainium://app/<URL 編碼過的 JSON>`，JSON 的欄位跟它匯出設定時
+一樣（`id`、`url`、`author`、`name`、`additionalSettings`）。注意 `additionalSettings`
+是一個**JSON 字串**而不是巢狀物件，Obtainium 那邊是直接 `jsonDecode` 它。
+
+這串由 `js/main.js` 的 `OBTAINIUM_APP` 組出來再塞進按鈕，沒有寫死在 HTML 的 `href`。
+理由是 Obtainium 追這一頁時會把頁面上每個 `href` 解碼後丟進 `Uri.parse`，而這串解碼
+出來有大括號、引號與空白。萬一哪個版本的解析器不吃，壞掉的是所有用 Obtainium 的人的
+更新檢查，而他們不會來跟我們說。一顆按鈕不值得賭這個——沒有 JS 時按鈕不出現，
+手動填的三個值本來就印在頁面上。
+
+`check.py` 會確認正則真的能從這一版的檔名讀出 `version.json` 裡的版本號、套件名一致、
+頁面上印的正則與 `js/main.js` 裡的是同一個，以及頁面上只有一個 `.apk` 連結。
+所以改檔名規則會在提交前就被擋下來，而不是變成沒人回報的靜默失效。
 
 ## 版本資訊格式
 
